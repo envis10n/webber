@@ -1,0 +1,21 @@
+{
+  "name": "webber",
+  "version": "0.0.1",
+  "description": "Web API",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "tsc && node .",
+    "build": "tsc"
+  },
+  "repository": "https://github.com/envis10n/webber.git",
+  "author": "envis10n",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^11.11.3",
+    "uWebSockets.js": "uNetworking/uWebSockets.js#v15.8.0"
+  },
+  "devDependencies": {
+    "tslint": "^5.14.0",
+    "typescript": "^3.3.3333"
+  }
+}
