@@ -18,6 +18,7 @@ API.post("/api/v1/thanosify", async (res, req) => {
                     result.push(ch);
                 }
             }
+            res.writeHeader("Content-Type", "application/json");
             res.end(JSON.stringify({
                 ts: Date.now(),
                 success: true,
@@ -35,6 +36,7 @@ API.get("/api/v1/srand", async (res, req) => {
     res.onAborted((resb) => {
         //
     });
+    res.writeHeader("Content-Type", "application/json");
     res.end(JSON.stringify({
         ts: Date.now(),
         responseTime: Date.now() - start,
