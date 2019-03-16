@@ -12,9 +12,14 @@
   "license": "MIT",
   "dependencies": {
     "@types/node": "^11.11.3",
-    "uWebSockets.js": "uNetworking/uWebSockets.js#v15.8.0"
+    "koa": "^2.7.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-router": "^7.4.0"
   },
   "devDependencies": {
+    "@types/koa": "^2.0.48",
+    "@types/koa-bodyparser": "^4.2.2",
+    "@types/koa-router": "^7.0.40",
     "tslint": "^5.14.0",
     "typescript": "^3.3.3333"
   }

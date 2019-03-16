@@ -1,3 +1,6 @@
-import { App, WebSocket, WebSocketBehavior, HttpRequest, HttpResponse } from "uWebSockets.js";
+import Koa from "koa";
+import bodyParser from "koa-bodyparser";
 
-export const API = App({});
+export const App = new Koa();
+
+App.use(bodyParser());
