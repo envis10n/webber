@@ -1,10 +1,57 @@
 import Router from "koa-router";
 import crypto from "crypto";
 import { promisify as _p } from "util";
-import generatePerlin from "../../../lib/perlin";
+import { fork } from "child_process";
 import { Perlin } from "libnoise-ts/module/generator";
 import { clamp } from "../../../lib/math";
 import { PNG } from "pngjs";
+import path from "path";
+import { v4 } from "uuid";
+
+declare interface IJob {
+    id: string;
+    resolve: (data: Buffer) => void;
+}
+
+const jobs: Map<string, IJob> = new Map();
+
+// Start worker.
+
+const worker = fork(path.join(process.cwd(), "dist", "modules", "mapping", "worker.js"),
+[], {cwd: process.cwd()});
+
+worker.on("message", (data: {id: string, buffer: {type: "buffer", data: Uint8Array}}) => {
+    const job = jobs.get(data.id);
+    if (!job) {
+        throw new Error("Invalid job ID.");
+    } else {
+        job.resolve(Buffer.from(data.buffer.data));
+    }
+});
+
+worker.on("exit", (code) => {
+    if (code !== 0) {
+        throw new Error("[MapGen] Closed with code " + code);
+    }
+});
+
+function addWork(seed: string, color: boolean): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+        const job: IJob = {
+            id: v4(),
+            resolve: (buffer: Buffer) => {
+                jobs.delete(job.id);
+                resolve(buffer);
+            },
+        };
+        jobs.set(job.id, job);
+        worker.send({
+            id: job.id,
+            seed,
+            color,
+        });
+    });
+}
 
 const heights = [
     0,
@@ -36,75 +83,16 @@ declare interface ITileData {
     gradient: number;
 }
 
-function genTiles(perlin3D: Perlin, size: number, height: number, start: number, end: number):
-Promise<ITileData[]> {
-    const tiles: ITileData[] = [];
-    return new Promise((resolve, reject) => {
-        for (let x = start; x < end; x++) {
-            for (let y = 0; y < size; y++) {
-                const grad = clamp(perlin3D.getValue(x / size, y / size, 0), 1, -0.7);
-                const theight = clamp(height * grad, height, 0);
-                heights.some((el, i) => {
-                    const cheight = el * height;
-                    if (theight <= cheight) {
-                        const tdata = {
-                            x,
-                            y,
-                            type: i,
-                            height: theight,
-                            gradient: grad,
-                        };
-                        tiles.push(tdata);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                });
-            }
-        }
-        resolve(tiles);
-    });
-}
-
-async function generateMap(seed: string, size: number, height: number):
-Promise<ITileData[]> {
-    const perlin3D = generatePerlin(seed);
-    return await genTiles(perlin3D, size, height, 0, 1024);
-}
-
 async function randomGen(len: number = 16): Promise<string> {
     return (await randomBytes(len * 2)).toString("hex");
 }
 
-function generateMapImage(seed: string, colors: boolean = true): Promise<Buffer> {
-    return new Promise(async (resolve, reject) => {
-        const map = await generateMap(seed, 1024, 1024);
-        const png = new PNG({
-            width: 1024,
-            height: 1024,
-            filterType: 4,
-            bgColor: {
-                red: 0,
-                green: 0,
-                blue: colors ? 128 : 0,
-            },
-        });
-        for (const tile of map) {
-            let {r, g, b} = htmlcolor[tile.type];
-            if (!colors) {
-                const gray = clamp(tile.gradient * 255);
-                r = gray;
-                g = gray;
-                b = gray;
-            }
-            const idx = (1024 * tile.y + tile.x) << 2;
-            png.data[idx] = r;
-            png.data[idx + 1] = g;
-            png.data[idx + 2] = b;
-            png.data[idx + 3] = 255;
-        }
-        resolve(PNG.sync.write(png));
-    });
+async function work(seed: string, colors: boolean = true): Promise<Buffer> {
+    return await addWork(seed, colors);
+}
+
+async function generateMapImage(seed: string, colors: boolean = true): Promise<Buffer> {
+    return await work(seed, colors);
 }
 
 export default async function(app: Router) {
