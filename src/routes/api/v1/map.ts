@@ -105,7 +105,7 @@ export default async function(app: Router) {
                 ts: Date.now(),
                 seed,
                 heights,
-                colors: [{r: 0, g: 0, b: 0}, {r: 255, g: 255, b: 255}],
+                colors: htmlcolor,
                 map: `data:image/png;base64,${buffer.toString("base64")}`,
             });
             resolve();
@@ -142,7 +142,7 @@ export default async function(app: Router) {
                     ts: Date.now(),
                     seed,
                     heights,
-                    colors: [{r: 0, g: 0, b: 0}, {r: 255, g: 255, b: 255}],
+                    colors: htmlcolor,
                     map: `data:image/png;base64,${buffer.toString("base64")}`,
                 });
             }
