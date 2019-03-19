@@ -15,12 +15,15 @@
     "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0",
+    "libnoise-ts": "^0.1.1",
+    "pngjs": "^3.4.0",
     "request": "^2.88.0"
   },
   "devDependencies": {
     "@types/koa": "^2.0.48",
     "@types/koa-bodyparser": "^4.2.2",
     "@types/koa-router": "^7.0.40",
+    "@types/pngjs": "^3.3.2",
     "@types/request": "^2.48.1",
     "tslint": "^5.14.0",
     "typescript": "^3.3.3333"
