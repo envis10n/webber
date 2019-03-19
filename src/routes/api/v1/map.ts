@@ -108,7 +108,22 @@ function generateMapImage(seed: string, colors: boolean = true): Promise<Buffer>
 }
 
 export default async function(app: Router) {
-    app.get("/map/:seed/json", (ctx, next) => {
+    app.get("/height/:seed.json", (ctx, next) => {
+        return new Promise(async (resolve, reject) => {
+            const seed: string = ctx.params.seed;
+            const buffer = await generateMapImage(seed, false);
+            ctx.set("Content-Type", "application/json");
+            ctx.body = JSON.stringify({
+                ts: Date.now(),
+                seed,
+                heights,
+                colors: [{r: 0, g: 0, b: 0}, {r: 255, g: 255, b: 255}],
+                map: `data:image/png;base64,${buffer.toString("base64")}`,
+            });
+            resolve();
+        });
+    });
+    app.get("/map/:seed.json", (ctx, next) => {
         return new Promise(async (resolve, reject) => {
             const seed: string = ctx.params.seed;
             const buffer = await generateMapImage(seed);
@@ -123,7 +138,7 @@ export default async function(app: Router) {
             resolve();
         });
     });
-    app.get("/map/:seed/height", (ctx, next) => {
+    app.get("/height/:seed", (ctx, next) => {
         return new Promise(async (resolve, reject) => {
             const seed: string = ctx.params.seed;
             let cType = "image/png";
@@ -138,6 +153,8 @@ export default async function(app: Router) {
                 ctx.body = JSON.stringify({
                     ts: Date.now(),
                     seed,
+                    heights,
+                    colors: [{r: 0, g: 0, b: 0}, {r: 255, g: 255, b: 255}],
                     map: `data:image/png;base64,${buffer.toString("base64")}`,
                 });
             }
@@ -159,6 +176,8 @@ export default async function(app: Router) {
                 ctx.body = JSON.stringify({
                     ts: Date.now(),
                     seed,
+                    heights,
+                    colors: htmlcolor,
                     map: `data:image/png;base64,${buffer.toString("base64")}`,
                 });
             }
