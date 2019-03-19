@@ -139,18 +139,17 @@ export default async function(app: Router) {
     app.get("/map/:seed", (ctx, next) => {
         return new Promise(async (resolve, reject) => {
             const seed: string = ctx.params.seed;
-            let view: boolean = false;
-            if (ctx.query.view && ctx.query.view === "true") { view = true; }
+            let cType = "image/png";
+            if (ctx.get("accept") === "application/json") { cType = "application/json"; }
             if (!(await mapExists(seed))) { await generateMapImage(seed); }
             // Map exists, load and serve.
             const buffer = await readMap(seed);
-            if (view) {
-                ctx.body = `<html>
-    <body>
-        <img src="data:image/png;base64,${buffer.toString("base64")}" width="1024" height="1024"/>
-    </body>
-</html>`;
+            if (cType === "image/png") {
+                ctx.set("Content-Disposition", "inline");
+                ctx.set("Content-Type", "image/png");
+                ctx.body = buffer;
             } else {
+                ctx.set("Content-Type", "application/json");
                 ctx.body = JSON.stringify({
                     ts: Date.now(),
                     seed,
