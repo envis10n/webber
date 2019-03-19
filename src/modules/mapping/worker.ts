@@ -88,22 +88,20 @@ function generateMapImage(seed: string, colors: boolean = true): Promise<Buffer>
             bgColor: {
                 red: 0,
                 green: 0,
-                blue: colors ? 128 : 0,
+                blue: 128,
             },
         });
         for (const tile of map) {
-            let {r, g, b} = htmlcolor[tile.type];
+            const {r, g, b} = htmlcolor[tile.type];
+            let a = 255;
             if (!colors) {
-                const gray = clamp(tile.gradient * 255);
-                r = gray;
-                g = gray;
-                b = gray;
+                a = clamp(tile.gradient * 255);
             }
             const idx = (1024 * tile.y + tile.x) << 2;
             png.data[idx] = r;
             png.data[idx + 1] = g;
             png.data[idx + 2] = b;
-            png.data[idx + 3] = 255;
+            png.data[idx + 3] = a;
         }
         resolve(PNG.sync.write(png));
     });

@@ -176,4 +176,8 @@ export default async function(app: Router) {
         const seed = await randomGen();
         ctx.redirect(`/api/v1/map/${seed}`);
     });
+    app.get("/height", async (ctx) => {
+        const seed = await randomGen();
+        ctx.redirect(`/api/v1/height/${seed}`);
+    });
 }
