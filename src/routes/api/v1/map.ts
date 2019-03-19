@@ -76,9 +76,8 @@ async function randomGen(len: number = 16): Promise<string> {
     return (await randomBytes(len * 2)).toString("hex");
 }
 
-function generateMapImage(seed?: string): Promise<{seed: string, image: Buffer}> {
+function generateMapImage(seed: string, colors: boolean = true): Promise<Buffer> {
     return new Promise(async (resolve, reject) => {
-        if (seed === undefined) { seed = await randomGen(); }
         const map = await generateMap(seed, 1024, 1024);
         const png = new PNG({
             width: 1024,
@@ -87,32 +86,70 @@ function generateMapImage(seed?: string): Promise<{seed: string, image: Buffer}>
             bgColor: {
                 red: 0,
                 green: 0,
-                blue: 128,
+                blue: colors ? 128 : 0,
             },
         });
         for (const tile of map) {
-            const color = htmlcolor[tile.type];
+            let {r, g, b} = htmlcolor[tile.type];
+            if (!colors) {
+                const gray = clamp(tile.gradient * 255);
+                r = gray;
+                g = gray;
+                b = gray;
+            }
             const idx = (1024 * tile.y + tile.x) << 2;
-            png.data[idx] = color.r;
-            png.data[idx + 1] = color.g;
-            png.data[idx + 2] = color.b;
+            png.data[idx] = r;
+            png.data[idx + 1] = g;
+            png.data[idx + 2] = b;
             png.data[idx + 3] = 255;
         }
-        resolve({
-            seed,
-            image: PNG.sync.write(png),
-        });
+        resolve(PNG.sync.write(png));
     });
 }
 
 export default async function(app: Router) {
+    app.get("/map/:seed/json", (ctx, next) => {
+        return new Promise(async (resolve, reject) => {
+            const seed: string = ctx.params.seed;
+            const buffer = await generateMapImage(seed);
+            ctx.set("Content-Type", "application/json");
+            ctx.body = JSON.stringify({
+                ts: Date.now(),
+                seed,
+                heights,
+                colors: htmlcolor,
+                map: `data:image/png;base64,${buffer.toString("base64")}`,
+            });
+            resolve();
+        });
+    });
+    app.get("/map/:seed/height", (ctx, next) => {
+        return new Promise(async (resolve, reject) => {
+            const seed: string = ctx.params.seed;
+            let cType = "image/png";
+            if (ctx.get("accept") === "application/json") { cType = "application/json"; }
+            const buffer = await generateMapImage(seed, false);
+            if (cType === "image/png") {
+                ctx.set("Content-Disposition", "inline");
+                ctx.set("Content-Type", "image/png");
+                ctx.body = buffer;
+            } else {
+                ctx.set("Content-Type", "application/json");
+                ctx.body = JSON.stringify({
+                    ts: Date.now(),
+                    seed,
+                    map: `data:image/png;base64,${buffer.toString("base64")}`,
+                });
+            }
+            resolve();
+        });
+    });
     app.get("/map/:seed", (ctx, next) => {
         return new Promise(async (resolve, reject) => {
             const seed: string = ctx.params.seed;
             let cType = "image/png";
             if (ctx.get("accept") === "application/json") { cType = "application/json"; }
-            const mapData: {seed: string, image: Buffer} = await generateMapImage(seed);
-            const buffer = mapData.image;
+            const buffer = await generateMapImage(seed);
             if (cType === "image/png") {
                 ctx.set("Content-Disposition", "inline");
                 ctx.set("Content-Type", "image/png");
