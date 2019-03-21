@@ -1,8 +1,8 @@
 import path from "path";
 import fs from "fs";
 import { promisify as _p } from "util";
-const readdir = _p(fs.readdir);
-const stat = _p(fs.stat);
+const readdir = _p(fs.readdir); // tslint:disable-line typedef
+const stat = _p(fs.stat); // tslint:disable-line typedef
 import { forEach, filter } from "./array";
 import Router from "koa-router";
 import Koa from "koa";
@@ -15,7 +15,7 @@ export interface IFileInfo {
 
 export type LoadRouter = (parent: Router | Koa) => Promise<void>;
 
-export async function loadRoutes(Routes: Router | Koa, Path: string) {
+export async function loadRoutes(Routes: Router | Koa, Path: string): Promise<void> {
     for (const route of (await readRoutes(Path))) {
         if (route.stat.isDirectory()) {
             console.log("Route folder found:", route.name);
@@ -32,15 +32,15 @@ export async function loadRoutes(Routes: Router | Koa, Path: string) {
 export async function readRoutes(dir: string): Promise<IFileInfo[]> {
     const files: string[] = await readdir(dir);
     const res: IFileInfo[] = [];
-    const f = await forEach<string>(files, async (e) => {
-        const p = path.join(dir, e);
-        const s = await stat(p);
-        const parsed = path.parse(p);
+    await forEach<string>(files, async (e) => {
+        const p: string = path.join(dir, e);
+        const s: fs.Stats = await stat(p);
+        const parsed: path.ParsedPath = path.parse(p);
         res.push({
             path: p,
             name: parsed.name,
             stat: s,
         });
     });
-    return await filter<IFileInfo>(res, async (e) => e.name !== "index");
+    return filter<IFileInfo>(res, async (e) => e.name !== "index");
 }

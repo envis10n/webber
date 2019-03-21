@@ -8,8 +8,22 @@
         "no-console": false,
         "ordered-imports": false,
         "object-literal-sort-keys": false,
+        "max-classes-per-file": false,
         "no-namespace": false,
-        "no-bitwise": false
+        "no-any": true,
+        "typedef": [
+            true,
+            "call-signature",
+            "arrow-call-signature",
+            "parameter",
+            "property-declaration",
+            "variable-declaration",
+            "member-variable-declaration",
+            "object-destructuring",
+            "array-destructuring"
+        ],
+        "no-construct": true,
+        "no-return-await": true
     },
     "rulesDirectory": []
 }

@@ -4,9 +4,9 @@ import { loadRoutes } from "../lib/routes";
 
 export type LoadRouter = (parent: Router) => Router;
 
-const Routes = new Router();
+const Routes: Router = new Router();
 
-export default async function(app: Koa) {
+export default async function(app: Koa): Promise<void> {
     // Load routes
     console.log("Loading routes...");
     await loadRoutes(Routes, __dirname);

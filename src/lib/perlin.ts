@@ -1,5 +1,4 @@
 import { Perlin } from "libnoise-ts/module/generator";
-import libnoise from "libnoise-ts";
 
 export default function(seed: string): Perlin {
     const s: number = seed.split("").map((e) => Number(e.codePointAt(0))).reduce((a, b) => a + b);

@@ -2,11 +2,13 @@ import Router from "koa-router";
 import srand from "../../../lib/rand";
 import { filter } from "../../../lib/array";
 
-export default async function(app: Router) {
+export default async function(app: Router): Promise<void> {
     app.post("/thanosify", async (ctx, next) => {
         const start: number = Date.now();
         try {
-            const body = ctx.request.body;
+            const body: {
+                [key: string]: any; // tslint:disable-line no-any
+            } = ctx.request.body;
             if (body.code) {
                 ctx.body = {
                     ts: Date.now(),

@@ -6,7 +6,7 @@ import { Perlin } from "libnoise-ts/module/generator";
 import { clamp } from "../../lib/math";
 import { PNG } from "pngjs";
 
-const heights = [
+const heights: number[] = [
     0,
     0.075,
     0.175,
@@ -16,7 +16,7 @@ const heights = [
     1.0,
 ];
 
-const htmlcolor = [
+const htmlcolor: Array<{r: number, g: number, b: number}> = [
     {r: 0, g: 0, b: 128},
     {r: 26, g: 26, b: 255},
     {r: 255, g: 255, b: 153},
@@ -26,7 +26,7 @@ const htmlcolor = [
     {r: 255, g: 255, b: 255},
 ];
 
-const randomBytes = _p(crypto.randomBytes);
+const randomBytes = _p(crypto.randomBytes); // tslint:disable-line typedef
 
 declare interface IWorkData {
     id: string;
@@ -44,17 +44,17 @@ declare interface ITileData {
 
 function genTiles(seed: string, size: number, height: number, start: number, end: number):
 Promise<ITileData[]> {
-    const perlin3D = generatePerlin(seed);
+    const perlin3D: Perlin = generatePerlin(seed);
     const tiles: ITileData[] = [];
-    return new Promise((resolve, reject) => {
-        for (let x = start; x < end; x++) {
-            for (let y = 0; y < size; y++) {
-                const grad = clamp(perlin3D.getValue(x / size, y / size, 0), 1, -0.7);
-                const theight = clamp(height * grad, height, 0);
+    return new Promise((resolve, reject): void => {
+        for (let x: number = start; x < end; x++) {
+            for (let y: number = 0; y < size; y++) {
+                const grad: number = clamp(perlin3D.getValue(x / size, y / size, 0), 1, -0.7);
+                const theight: number = clamp(height * grad, height, 0);
                 heights.some((el, i) => {
-                    const cheight = el * height;
+                    const cheight: number = el * height;
                     if (theight <= cheight) {
-                        const tdata = {
+                        const tdata: ITileData = {
                             x,
                             y,
                             type: i,
@@ -75,13 +75,13 @@ Promise<ITileData[]> {
 
 async function generateMap(seed: string, size: number, height: number):
 Promise<ITileData[]> {
-    return await genTiles(seed, size, height, 0, 1024);
+    return genTiles(seed, size, height, 0, 1024);
 }
 
 function generateMapImage(seed: string, colors: boolean = true): Promise<Buffer> {
-    return new Promise(async (resolve, reject) => {
-        const map = await generateMap(seed, 1024, 1024);
-        const png = new PNG({
+    return new Promise(async (resolve, reject): Promise<void> => {
+        const map: ITileData[] = await generateMap(seed, 1024, 1024);
+        const png: PNG = new PNG({
             width: 1024,
             height: 1024,
             filterType: 4,
@@ -92,12 +92,12 @@ function generateMapImage(seed: string, colors: boolean = true): Promise<Buffer>
             },
         });
         for (const tile of map) {
-            const {r, g, b} = htmlcolor[tile.type];
-            let a = 255;
+            const {r, g, b}: {r: number, g: number, b: number} = htmlcolor[tile.type];
+            let a: number = 255;
             if (!colors) {
                 a = clamp(tile.gradient * 255);
             }
-            const idx = (1024 * tile.y + tile.x) << 2;
+            const idx: number = (1024 * tile.y + tile.x) << 2; // tslint:disable-line no-bitwise
             png.data[idx] = r;
             png.data[idx + 1] = g;
             png.data[idx + 2] = b;
@@ -111,7 +111,7 @@ process.on("message", (data) => {
     // Read for start.
     if (typeof data === "object") {
         console.log("[MapGen] Starting work:", data);
-        const work = data as IWorkData;
+        const work: IWorkData = data as IWorkData;
         generateMapImage(work.seed, work.color).then((buffer) => {
             console.log("[MapGen] Work for {", work.seed, "} complete.");
             if (process.send) {

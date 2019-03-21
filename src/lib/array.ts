@@ -2,7 +2,7 @@ export async function filter<T>(arr: T[],
                                 callbackfn: (element: T, index?: number, array?: T[])
         => Promise<boolean | undefined>): Promise<T[]> {
     const res: T[] = [];
-    for (let i = 0; i < arr.length; i++) {
+    for (let i: number = 0; i < arr.length; i++) {
         if (await callbackfn(arr[i], i, arr)) {
             res.push(arr[i]);
         }
@@ -13,7 +13,7 @@ export async function filter<T>(arr: T[],
 export async function forEach<T>(arr: T[],
                                  callbackfn: (element: T, index?: number, array?: T[])
                                  => Promise<void>): Promise<void> {
-    for (let i = 0; i < arr.length; i++) {
+    for (let i: number = 0; i < arr.length; i++) {
         await callbackfn(arr[i], i, arr);
     }
 }

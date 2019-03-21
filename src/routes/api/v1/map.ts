@@ -1,10 +1,7 @@
 import Router from "koa-router";
 import crypto from "crypto";
 import { promisify as _p } from "util";
-import { fork } from "child_process";
-import { Perlin } from "libnoise-ts/module/generator";
-import { clamp } from "../../../lib/math";
-import { PNG } from "pngjs";
+import { ChildProcess, fork } from "child_process";
 import path from "path";
 import { v4 } from "uuid";
 
@@ -17,11 +14,11 @@ const jobs: Map<string, IJob> = new Map();
 
 // Start worker.
 
-const worker = fork(path.join(process.cwd(), "dist", "modules", "mapping", "worker.js"),
+const worker: ChildProcess = fork(path.join(process.cwd(), "dist", "modules", "mapping", "worker.js"),
 [], {cwd: process.cwd()});
 
 worker.on("message", (data: {id: string, buffer: {type: "buffer", data: Uint8Array}}) => {
-    const job = jobs.get(data.id);
+    const job: IJob | undefined = jobs.get(data.id);
     if (!job) {
         throw new Error("Invalid job ID.");
     } else {
@@ -36,10 +33,10 @@ worker.on("exit", (code) => {
 });
 
 function addWork(seed: string, color: boolean): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject): void => {
         const job: IJob = {
             id: v4(),
-            resolve: (buffer: Buffer) => {
+            resolve: (buffer: Buffer): void => {
                 jobs.delete(job.id);
                 resolve(buffer);
             },
@@ -53,7 +50,7 @@ function addWork(seed: string, color: boolean): Promise<Buffer> {
     });
 }
 
-const heights = [
+const heights: number[] = [
     0,
     0.075,
     0.175,
@@ -63,7 +60,7 @@ const heights = [
     1.0,
 ];
 
-const htmlcolor = [
+const htmlcolor: Array<{r: number, g: number, b: number}> = [
     {r: 0, g: 0, b: 128},
     {r: 26, g: 26, b: 255},
     {r: 255, g: 255, b: 153},
@@ -73,7 +70,7 @@ const htmlcolor = [
     {r: 255, g: 255, b: 255},
 ];
 
-const randomBytes = _p(crypto.randomBytes);
+const randomBytes = _p(crypto.randomBytes); // tslint:disable-line typedef
 
 declare interface ITileData {
     x: number;
@@ -88,18 +85,18 @@ async function randomGen(len: number = 16): Promise<string> {
 }
 
 async function work(seed: string, colors: boolean = true): Promise<Buffer> {
-    return await addWork(seed, colors);
+    return addWork(seed, colors);
 }
 
 async function generateMapImage(seed: string, colors: boolean = true): Promise<Buffer> {
-    return await work(seed, colors);
+    return work(seed, colors);
 }
 
-export default async function(app: Router) {
+export default async function(app: Router): Promise<void> {
     app.get("/height/:seed.json", (ctx, next) => {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve, reject): Promise<void> => {
             const seed: string = ctx.params.seed;
-            const buffer = await generateMapImage(seed, false);
+            const buffer: Buffer = await generateMapImage(seed, false);
             ctx.set("Content-Type", "application/json");
             ctx.body = JSON.stringify({
                 ts: Date.now(),
@@ -112,9 +109,9 @@ export default async function(app: Router) {
         });
     });
     app.get("/map/:seed.json", (ctx, next) => {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve, reject): Promise<void> => {
             const seed: string = ctx.params.seed;
-            const buffer = await generateMapImage(seed);
+            const buffer: Buffer = await generateMapImage(seed);
             ctx.set("Content-Type", "application/json");
             ctx.body = JSON.stringify({
                 ts: Date.now(),
@@ -127,11 +124,11 @@ export default async function(app: Router) {
         });
     });
     app.get("/height/:seed", (ctx, next) => {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve, reject): Promise<void> => {
             const seed: string = ctx.params.seed;
-            let cType = "image/png";
+            let cType: "image/png" | "application/json" = "image/png";
             if (ctx.get("accept") === "application/json") { cType = "application/json"; }
-            const buffer = await generateMapImage(seed, false);
+            const buffer: Buffer = await generateMapImage(seed, false);
             if (cType === "image/png") {
                 ctx.set("Content-Disposition", "inline");
                 ctx.set("Content-Type", "image/png");
@@ -150,11 +147,11 @@ export default async function(app: Router) {
         });
     });
     app.get("/map/:seed", (ctx, next) => {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve, reject): Promise<void> => {
             const seed: string = ctx.params.seed;
-            let cType = "image/png";
+            let cType: "image/png" | "application/json" = "image/png";
             if (ctx.get("accept") === "application/json") { cType = "application/json"; }
-            const buffer = await generateMapImage(seed);
+            const buffer: Buffer = await generateMapImage(seed);
             if (cType === "image/png") {
                 ctx.set("Content-Disposition", "inline");
                 ctx.set("Content-Type", "image/png");
@@ -173,11 +170,11 @@ export default async function(app: Router) {
         });
     });
     app.get("/map", async (ctx) => {
-        const seed = await randomGen();
+        const seed: string = await randomGen();
         ctx.redirect(`/api/v1/map/${seed}`);
     });
     app.get("/height", async (ctx) => {
-        const seed = await randomGen();
+        const seed: string = await randomGen();
         ctx.redirect(`/api/v1/height/${seed}`);
     });
 }
