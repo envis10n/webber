@@ -4,6 +4,8 @@ import { promisify as _p } from "util";
 import { ChildProcess, fork } from "child_process";
 import path from "path";
 import { v4 } from "uuid";
+import views from "../../../lib/views";
+import request from "../../../lib/request";
 
 declare interface IJob {
     id: string;
@@ -93,7 +95,7 @@ async function generateMapImage(seed: string, colors: boolean = true): Promise<B
 }
 
 export default async function(app: Router): Promise<void> {
-    app.get("/height/:seed.json", (ctx, next) => {
+    app.get("/map/height/:seed.json", (ctx, next) => {
         return new Promise(async (resolve, reject): Promise<void> => {
             const seed: string = ctx.params.seed;
             const buffer: Buffer = await generateMapImage(seed, false);
@@ -108,7 +110,7 @@ export default async function(app: Router): Promise<void> {
             resolve();
         });
     });
-    app.get("/map/:seed.json", (ctx, next) => {
+    app.get("/map/color/:seed.json", (ctx, next) => {
         return new Promise(async (resolve, reject): Promise<void> => {
             const seed: string = ctx.params.seed;
             const buffer: Buffer = await generateMapImage(seed);
@@ -123,7 +125,7 @@ export default async function(app: Router): Promise<void> {
             resolve();
         });
     });
-    app.get("/height/:seed", (ctx, next) => {
+    app.get("/map/height/:seed", (ctx, next) => {
         return new Promise(async (resolve, reject): Promise<void> => {
             const seed: string = ctx.params.seed;
             let cType: "image/png" | "application/json" = "image/png";
@@ -146,7 +148,7 @@ export default async function(app: Router): Promise<void> {
             resolve();
         });
     });
-    app.get("/map/:seed", (ctx, next) => {
+    app.get("/map/color/:seed", (ctx, next) => {
         return new Promise(async (resolve, reject): Promise<void> => {
             const seed: string = ctx.params.seed;
             let cType: "image/png" | "application/json" = "image/png";
@@ -169,12 +171,24 @@ export default async function(app: Router): Promise<void> {
             resolve();
         });
     });
-    app.get("/map", async (ctx) => {
+    app.get("/map/color", async (ctx) => {
         const seed: string = await randomGen();
         ctx.redirect(`/api/v1/map/${seed}`);
     });
-    app.get("/height", async (ctx) => {
+    app.get("/map/height", async (ctx) => {
         const seed: string = await randomGen();
         ctx.redirect(`/api/v1/height/${seed}`);
+    });
+    app.get("/map/view/:seed", async (ctx) => {
+        return new Promise(async (resolve, reject): Promise<void> => {
+            const seed: string = ctx.params.seed;
+            const buffer: Buffer = await generateMapImage(seed, false);
+            ctx.set("Content-Type", "text/html");
+            ctx.body = await views("viewer", {
+                mapURL: `data:image/png;base64,${buffer.toString("base64")}`,
+                mapSeed: seed,
+            });
+            resolve();
+        });
     });
 }
