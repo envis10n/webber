@@ -173,11 +173,11 @@ export default async function(app: Router): Promise<void> {
     });
     app.get("/map/color", async (ctx) => {
         const seed: string = await randomGen();
-        ctx.redirect(`/api/v1/map/${seed}`);
+        ctx.redirect(`/api/v1/map/color/${seed}`);
     });
     app.get("/map/height", async (ctx) => {
         const seed: string = await randomGen();
-        ctx.redirect(`/api/v1/height/${seed}`);
+        ctx.redirect(`/api/v1/map/height/${seed}`);
     });
     app.get("/map/view/:seed", async (ctx) => {
         return new Promise(async (resolve, reject): Promise<void> => {
