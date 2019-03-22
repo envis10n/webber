@@ -191,4 +191,8 @@ export default async function(app: Router): Promise<void> {
             resolve();
         });
     });
+    app.get("/map/view", async (ctx) => {
+        const seed: string = await randomGen();
+        ctx.redirect(`/api/v1/map/view/${seed}`);
+    });
 }
