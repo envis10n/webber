@@ -5,7 +5,6 @@ import { ChildProcess, fork } from "child_process";
 import path from "path";
 import { v4 } from "uuid";
 import views from "../../../lib/views";
-import request from "../../../lib/request";
 
 declare interface IJob {
     id: string;

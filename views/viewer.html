@@ -10,7 +10,7 @@
 	</head>
 	<body>
         <script src="/js/three.js"></script>
-        <script src="/js/orbit.js"></script>
+        <script src="/js/trackball.js"></script>
         <script src="/js/chroma.min.js"></script>
 		<script>
             // global variables
@@ -47,7 +47,7 @@
                 renderer.setClearColor(0x000000, 1.0);
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 // add light
-                let light = new THREE.DirectionalLight();
+                let light = new THREE.DirectionalLight(0xffffff, 2);
                 light.position.set(1200, 1200, 1200);
                 scene.add(light);
                 // position and point the camera to the center of the scene
@@ -57,7 +57,7 @@
                 camera.lookAt(scene.position);
                 // add the output of the renderer to the html element
                 document.body.appendChild(renderer.domElement);
-                control = new THREE.OrbitControls( camera );
+                control = new THREE.TrackballControls( camera );
                 control.update();
                 createGeometryFromMap();
                 // call the render function
@@ -86,7 +86,7 @@
                             // get pixel
                             // since we're grayscale, we only need one element
                             let yValue = pixel.data[(z * 4 + (depth * x * 4)) + 3];
-                            let vertex = new THREE.Vector3(x * spacingX, yValue, z * spacingZ);
+                            let vertex = new THREE.Vector3(x * spacingX, yValue * 1.2, z * spacingZ);
                             geom.vertices.push(vertex);
                         }
                     }
