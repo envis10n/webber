@@ -5,6 +5,11 @@ import { ChildProcess, fork } from "child_process";
 import path from "path";
 import { v4 } from "uuid";
 import views from "../../../lib/views";
+import fs from "fs";
+
+const readFile = _p(fs.readFile); // tslint:disable-line typedef
+const writeFile = _p(fs.writeFile); // tslint:disable-line typedef
+const exists = _p(fs.exists); // tslint:disable-line typedef
 
 declare interface IJob {
     id: string;
@@ -90,7 +95,17 @@ async function work(seed: string, colors: boolean = true): Promise<Buffer> {
 }
 
 async function generateMapImage(seed: string, colors: boolean = true): Promise<Buffer> {
-    return work(seed, colors);
+    const p: string = path.join(process.cwd(),
+    "storage", "maps",
+    colors ? "color" : "height",
+    seed + ".png");
+    if (await exists(p)) {
+        return readFile(p);
+    } else {
+        const data: Buffer = await work(seed, colors);
+        await writeFile(p, data);
+        return data;
+    }
 }
 
 export default async function(app: Router): Promise<void> {
