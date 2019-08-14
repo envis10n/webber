@@ -14,8 +14,12 @@ export default async function(app: Router): Promise<void> {
                     ts: Date.now(),
                     success: true,
                     responseTime: Date.now() - start,
-                    code: "// Thanosified by wEBBER API.\n\n" + (await filter((body.code as string).split(""),
-                    async (ch) => (await srand()) <= 0.5)).join(""),
+                    code:
+                        "// Thanosified by wEBBER API.\n\n" +
+                        (await filter(
+                            (body.code as string).split(""),
+                            async (ch) => (await srand()) <= 0.5,
+                        )).join(""),
                 };
             }
         } catch (e) {
