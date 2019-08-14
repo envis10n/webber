@@ -91,10 +91,10 @@ export default async function(app: Router): Promise<void> {
             let len: number = 200;
             if (
                 body.len !== undefined &&
-                typeof body.len === "number" &&
-                !isNaN(body.len)
+                typeof body.length === "number" &&
+                !isNaN(body.length)
             ) {
-                len = body.len;
+                len = body.length;
             }
             try {
                 const m: IMarkov = markov(body.input, 2);
