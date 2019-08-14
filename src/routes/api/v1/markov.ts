@@ -90,7 +90,7 @@ export default async function(app: Router): Promise<void> {
         if (body.input !== undefined && typeof body.input === "string") {
             let len: number = 200;
             if (
-                body.len !== undefined &&
+                body.length !== undefined &&
                 typeof body.length === "number" &&
                 !isNaN(body.length)
             ) {
