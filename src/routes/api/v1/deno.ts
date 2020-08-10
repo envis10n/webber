@@ -46,12 +46,16 @@ export async function denoEval(lang: "ts" | "js", code: string, id: string): Pro
                         if (err.killed) {
                             output = "error: Script timed out.";
                         } else if (stderr.trim().length > 0) {
-                            const s = stripAnsi(stderr.trim());
-                            const s1 = s.split("\n").slice(1);
-                            let s2 = s1[0];
-                            if (s1.length > 2) s2 = s1.join("\n");
-                            if (s2 == undefined) output = s;
-                            else output = s2.replace(new RegExp(fPath.replace(/\\/g, "/"), 'g'), `_${id}.${fExt}`);
+                            const s = stripAnsi(stderr.trim()).replace(new RegExp(fPath.replace(/\\/g, "/"), 'g'), `_${id}.${fExt}`);
+                            let s1 = s.split("\n");
+                            if (s1[0].startsWith("Check file")) s1 = s1.slice(1);
+                            if (s1.length == 0) output = err.toString();
+                            else {
+                                let s2 = s1[0];
+                                if (s1.length > 2) s2 = s1.join("\n");
+                                if (s2 == undefined) output = s;
+                                else output = s2;
+                            }
                         } else {
                             output = err.message;
                         }
