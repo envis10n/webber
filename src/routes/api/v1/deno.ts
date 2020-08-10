@@ -69,7 +69,7 @@ interface IDenoResponse {
     responseTime?: number;
     error?: string;
     version?: IDenoVersion;
-    output?: IDenoResult;
+    eval?: IDenoResult;
 }
 
 export default async function(app: Router): Promise<void> {
@@ -108,7 +108,7 @@ export default async function(app: Router): Promise<void> {
                     resp.error = "Unsupported language. Supported languages are: ts, js";
                 } else {
                     try {
-                        resp.output = await denoEval(body.language, body.source, body.id);
+                        resp.eval = await denoEval(body.language, body.source, body.id);
                     } catch (e) {
                         resp.error = e.message;
                     }
