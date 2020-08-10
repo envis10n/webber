@@ -18,7 +18,7 @@
     "koa-static": "^5.0.0",
     "libnoise-ts": "^0.1.1",
     "pngjs": "^3.4.0",
-    "request": "^2.88.0",
+    "strip-ansi": "^6.0.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
@@ -27,7 +27,6 @@
     "@types/koa-router": "^7.0.40",
     "@types/koa-static": "^4.0.1",
     "@types/pngjs": "^3.3.2",
-    "@types/request": "^2.48.1",
     "@types/uuid": "^3.4.4",
     "tslint": "^5.14.0",
     "typescript": "^3.3.3333"
