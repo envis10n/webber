@@ -33,9 +33,10 @@ export async function denoEval(lang: "ts" | "js", code: string, id: string): Pro
         if (existsSync(fPath)) reject("Script already running.");
         else {
             const _start = Date.now();
-            const src = `const __programStart = ${_start};\nconst __canRun = () => Date.now() - __programStart <= 4900;${code}`;
+            const reg = /import.+from.+/g;
+            const src = `const __programStart = ${_start};\nconst __canRun = () => Date.now() - __programStart <= 4900;${code.replace(reg, "").trim()}`;
             fs.writeFileSync(fPath, src);
-            exec(`deno run ${fPath}`, {timeout: 5000}, (err, stdout, stderr) => {
+            exec(`deno run --quiet --no-remote ${fPath}`, {timeout: 5000}, (err, stdout, stderr) => {
                 const runtime = Date.now() - _start;
                 fs.unlinkSync(fPath);
                 let output = "";
