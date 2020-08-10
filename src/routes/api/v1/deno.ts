@@ -44,11 +44,13 @@ export async function denoEval(lang: "ts" | "js", code: string, id: string): Pro
                     hadError = true;
                     if (err.killed) {
                         output = "error: Script timed out.";
-                    } else {
+                    } else if (stderr.trim().length > 0) {
                         const s1 = stripAnsi(stderr.trim()).split("\n").slice(1);
                         let s2 = s1[0];
                         if (s1.length > 2) s2 = s1.join("\n");
                         output = s2.replace(new RegExp(fPath.replace(/\\/g, "/"), 'g'), `_${id}.${fExt}`);
+                    } else {
+                        output = err.message;
                     }
                 } else {
                     output = stripAnsi(stdout.trim());
