@@ -11,7 +11,7 @@ function srand(): number {
 function srange(
     max: number = 1,
     min: number = 0,
-    round: boolean = true,
+    round: boolean = true
 ): number {
     const res: number = srand() * (max - min) + min;
     return round ? Math.round(res) : res;
@@ -81,7 +81,12 @@ function generate(mark: IMarkov, length: number): string {
     return res.join(" ");
 }
 
-export default async function(app: Router): Promise<void> {
+export default async function (app: Router): Promise<void> {
+    app.options("/markov", async (ctx, next) => {
+        ctx.set("Access-Control-Allow-Origin", "*");
+        ctx.set("Access-Control-Allow-Methods", "POST, GET");
+        ctx.set("Access-Control-Max-Age", "86400");
+    });
     app.post("/markov", async (ctx, next) => {
         const start: number = Date.now();
         const body: {
