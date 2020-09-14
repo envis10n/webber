@@ -82,12 +82,6 @@ function generate(mark: IMarkov, length: number): string {
 }
 
 export default async function (app: Router): Promise<void> {
-    app.options("/markov", async (ctx, next) => {
-        ctx.set("Access-Control-Allow-Origin", "*");
-        ctx.set("Access-Control-Allow-Methods", "POST, GET");
-        ctx.set("Access-Control-Max-Age", "86400");
-        ctx.respond = true;
-    });
     app.post("/markov", async (ctx, next) => {
         const start: number = Date.now();
         const body: {

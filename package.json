@@ -1,34 +1,36 @@
 {
-  "name": "webber",
-  "version": "0.0.1",
-  "description": "Web API",
-  "main": "dist/main.js",
-  "scripts": {
-    "start": "tsc && node .",
-    "build": "tsc"
-  },
-  "repository": "https://github.com/envis10n/webber.git",
-  "author": "envis10n",
-  "license": "MIT",
-  "dependencies": {
-    "@types/node": "^11.11.3",
-    "koa": "^2.7.0",
-    "koa-bodyparser": "^4.2.1",
-    "koa-router": "^7.4.0",
-    "koa-static": "^5.0.0",
-    "libnoise-ts": "^0.1.1",
-    "pngjs": "^3.4.0",
-    "strip-ansi": "^6.0.0",
-    "uuid": "^3.3.2"
-  },
-  "devDependencies": {
-    "@types/koa": "^2.0.48",
-    "@types/koa-bodyparser": "^4.2.2",
-    "@types/koa-router": "^7.0.40",
-    "@types/koa-static": "^4.0.1",
-    "@types/pngjs": "^3.3.2",
-    "@types/uuid": "^3.4.4",
-    "tslint": "^5.14.0",
-    "typescript": "^3.3.3333"
-  }
+    "name": "webber",
+    "version": "0.0.1",
+    "description": "Web API",
+    "main": "dist/main.js",
+    "scripts": {
+        "start": "tsc && node .",
+        "build": "tsc"
+    },
+    "repository": "https://github.com/envis10n/webber.git",
+    "author": "envis10n",
+    "license": "MIT",
+    "dependencies": {
+        "koa": "^2.7.0",
+        "koa-bodyparser": "^4.2.1",
+        "koa-cors": "^0.0.16",
+        "koa-router": "^7.4.0",
+        "koa-static": "^5.0.0",
+        "libnoise-ts": "^0.1.1",
+        "pngjs": "^3.4.0",
+        "strip-ansi": "^6.0.0",
+        "uuid": "^3.3.2"
+    },
+    "devDependencies": {
+        "@types/koa": "^2.0.48",
+        "@types/koa-bodyparser": "^4.2.2",
+        "@types/koa-cors": "^0.0.0",
+        "@types/koa-router": "^7.0.40",
+        "@types/koa-static": "^4.0.1",
+        "@types/node": "^14.10.1",
+        "@types/pngjs": "^3.3.2",
+        "@types/uuid": "^3.4.4",
+        "tslint": "^5.14.0",
+        "typescript": "^3.3.3333"
+    }
 }
