@@ -10,8 +10,7 @@ import path from "path";
     App.use(
         cors({
             maxAge: 86400,
-            origin: true,
-            credentials: true,
+            origin: "*",
             methods: ["POST", "GET"],
         })
     );
