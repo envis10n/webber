@@ -5,8 +5,6 @@ import cors from "koa-cors";
 import path from "path";
 
 (async (): Promise<void> => {
-    await Routes(App);
-    App.use(serve(path.join(process.cwd(), "public")));
     App.use(
         cors({
             maxAge: 86400,
@@ -14,6 +12,8 @@ import path from "path";
             methods: ["POST", "GET"],
         })
     );
+    await Routes(App);
+    App.use(serve(path.join(process.cwd(), "public")));
     App.listen(3056, () => {
         console.log("Koa Webserver Online.");
     });
